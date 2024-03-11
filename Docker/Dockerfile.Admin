@@ -1,0 +1,15 @@
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-env
+WORKDIR /Admin
+
+
+COPY . ./
+RUN dotnet restore
+RUN dotnet publish -c Release -o out
+
+FROM mcr.microsoft.com/dotnet/aspnet:8.0
+WORKDIR /Admin
+COPY --from=build-env /Admin/out .
+
+EXPOSE 9001
+
+ENTRYPOINT ["dotnet", "Admin.Host.dll"]
