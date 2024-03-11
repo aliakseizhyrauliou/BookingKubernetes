@@ -1,8 +1,16 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-env
 WORKDIR /Admin
 
+#Layers
+COPY ../../Booking/Booking.Application.csproj ./Booking/Booking.Application.csproj
+COPY ../../Booking/Booking.Domain.csproj ./Booking/Booking.Domain.csproj
+COPY ../../Booking/Booking.Persistence.csproj ./Booking/Booking.Persistence.csproj
 
-COPY . ./
+
+#Common
+COPY ../../BuildingBlocks/Common.csproj ./BuildingBlocks/Common.csproj
+COPY ../../BuildingBlocks/Domain.csproj ./BuildingBlocks/Domain.csproj
+
 RUN dotnet restore
 RUN dotnet publish -c Release -o out
 
