@@ -1,23 +1,26 @@
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-env
-WORKDIR /Admin
-
-#Layers
-COPY ../../Booking/Booking.Application.csproj ./Booking/Booking.Application.csproj
-COPY ../../Booking/Booking.Domain.csproj ./Booking/Booking.Domain.csproj
-COPY ../../Booking/Booking.Persistence.csproj ./Booking/Booking.Persistence.csproj
-
-
-#Common
-COPY ../../BuildingBlocks/Common.csproj ./BuildingBlocks/Common.csproj
-COPY ../../BuildingBlocks/Domain.csproj ./BuildingBlocks/Domain.csproj
-
-RUN dotnet restore
-RUN dotnet publish -c Release -o out
-
-FROM mcr.microsoft.com/dotnet/aspnet:8.0
-WORKDIR /Admin
-COPY --from=build-env /Admin/out .
-
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+WORKDIR /app
 EXPOSE 9001
 
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+ARG BUILD_CONFIGURATION=Release
+WORKDIR /src
+COPY ["Web/Admin.Host/Admin.Host.csproj", "Web/Admin.Host/"]
+COPY ["BuildingBlocks/Common/Common.csproj", "BuildingBlocks/Common/"]
+COPY ["BuildingBlocks/Domain/Domain.csproj", "BuildingBlocks/Domain/"]
+COPY ["Services/Booking/Booking.Application/Booking.Application.csproj", "Services/Booking/Booking.Application/"]
+COPY ["Services/Booking/Booking.Persistence/Booking.Persistence.csproj", "Services/Booking/Booking.Persistence/"]
+COPY ["Services/Booking/Booking.Domain/Booking.Domain.csproj", "Services/Booking/Booking.Domain/"]
+RUN dotnet restore "./Web/Admin.Host/./Admin.Host.csproj"
+COPY . .
+WORKDIR "/src/Web/Admin.Host"
+RUN dotnet build "./Admin.Host.csproj" -c %BUILD_CONFIGURATION% -o /app/build
+
+FROM build AS publish
+ARG BUILD_CONFIGURATION=Release
+RUN dotnet publish "./Admin.Host.csproj" -c %BUILD_CONFIGURATION% -o /app/publish /p:UseAppHost=false
+
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "Admin.Host.dll"]
