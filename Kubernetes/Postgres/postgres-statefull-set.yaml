@@ -35,13 +35,9 @@ spec:
         ports:
         - containerPort: 5432
         volumeMounts:
-        - name: postgres-volume-claim
+        - name: postgres-data
           mountPath: /var/lib/postgresql/data
-  volumeClaimTemplates:
-  - metadata:
-      name: postgres-volume-claim
-    spec:
-      accessModes: [ "ReadWriteOnce" ]
-      resources:
-        requests:
-          storage: 10Gi
+      volumes:
+      - name: postgres-data
+        persistentVolumeClaim:
+          claimName: postgres-volume-claim

@@ -18,3 +18,23 @@ spec:
             name: booking
             port:
               number: 9002
+  - host: my.app.admin
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: admin
+            port:
+              number: 9001
+  - host: my.app.identity
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: admin
+            port:
+              number: 9003
