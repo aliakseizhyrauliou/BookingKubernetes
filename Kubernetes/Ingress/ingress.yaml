@@ -8,7 +8,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - host: my.app.booking
+  - host: booking.aliaksei-zhurauliou.com
     http:
       paths:
       - path: /
@@ -16,9 +16,10 @@ spec:
         backend:
           service:
             name: booking
+            
             port:
               number: 9002
-  - host: my.app.admin
+  - host: admin.aliaksei-zhurauliou.com
     http:
       paths:
       - path: /
@@ -28,7 +29,7 @@ spec:
             name: admin
             port:
               number: 9001
-  - host: my.app.identity
+  - host: identity.aliaksei-zhurauliou.com
     http:
       paths:
       - path: /
